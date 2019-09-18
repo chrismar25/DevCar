@@ -6,6 +6,11 @@ bool newInput = false;
 int mode = 0;
 int limit = 0;
 
+
+// Changeing something in the code
+
+// further changes
+
 void setup() {
   Serial.begin(9600);
   while (!Serial);
