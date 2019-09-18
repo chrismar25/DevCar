@@ -1,166 +1,166 @@
-if (dflag == 1) {//Scenario 4a. Keep d constant
+if (lwallflag == 1) {//Scenario 4a. Keep d constant
 
     //TURN SHARPLY RIGHT IF-FOR myservo.write()
-    if (((dkeep - d) > tol2) && (c > cmin) && (b > bmin)) {
+    if (((sleftkeep - sleft) > tol2) && (us > usmin) && (sright > srightmin)) {
       for (i = 105; i >= 85; i = i - 5) {
         myservo.write(i); //Turn the wheels sharply to the right.
         delay(1);
       }
       Serial.println("Scenario 4aRR. Turn sharply right!");
-      while (((dkeep - d) > tol2) && (c > cmin) && (b > bmin)) {
-        cold = c;
-        b = read_b();
-        c = read_c();
-        d = read_d();
-        //if (cold-c > cdecmax){c = cold;}
+      while (((sleftkeep - sleft) > tol2) && (us > usmin) && (sright > srightmin)) {
+        usold = us;
+        sright = read_sright();
+        us = read_us();
+        sleft = read_sleft();
+        //if (usold-us > cdecmax){us = usold;}
       }
-      Serial.print("dkeep after loop:");
-      Serial.print(dkeep);
+      Serial.print("sleftkeep after loop:");
+      Serial.print(sleftkeep);
       Serial.println("cm");
     }
-    if (((dkeep - d) > tol) && (c > cmin) && (b > bmin)) {
+    if (((sleftkeep - sleft) > tol) && (us > usmin) && (sright > srightmin)) {
       myservo.write(98); //Turn the wheels to the right.
       Serial.println("Scenario 4aR. Turn right!");
-      while (((dkeep - d) > tol) && (c > cmin) && (b > bmin)) {
-        cold = c;
-        b = read_b();
-        c = read_c();
-        d = read_d();
-        //if (cold-c > cdecmax){c = cold;}
+      while (((sleftkeep - sleft) > tol) && (us > usmin) && (sright > srightmin)) {
+        usold = us;
+        sright = read_sright();
+        us = read_us();
+        sleft = read_sleft();
+        //if (usold-us > cdecmax){us = usold;}
       }
-      Serial.print("dkeep after loop:");
-      Serial.print(dkeep);
+      Serial.print("sleftkeep after loop:");
+      Serial.print(sleftkeep);
       Serial.println("cm");
     }
     
     //TURN SHARPLY LEFT IF-FOR myservo.write()
-    if (((d - dkeep) > tol2) && (c > cmin) && (b > bmin)) {
+    if (((sleft - sleftkeep) > tol2) && (us > usmin) && (sright > srightmin)) {
       for (i = 115; i <= 135; i = i + 5) {
         myservo.write(i); //Turn the wheels to the left.
         delay(1);
       }
       Serial.println("Scenario 4aLL. Turn sharply left.");
-      while (((d - dkeep) > tol2) && (c > cmin) && (b > bmin)) {
-        cold = c;
-        b = read_b();
-        c = read_c();
-        d = read_d();
-        //if (cold-c > cdecmax){c = cold;} //Not good
+      while (((sleft - sleftkeep) > tol2) && (us > usmin) && (sright > srightmin)) {
+        usold = us;
+        sright = read_sright();
+        us = read_us();
+        sleft = read_sleft();
+        //if (usold-us > cdecmax){us = usold;} //Not good
       }
-      Serial.print("dkeep after loop:");
-      Serial.print(dkeep);
+      Serial.print("sleftkeep after loop:");
+      Serial.print(sleftkeep);
       Serial.println("cm");
     }
-    if (((d - dkeep) > tol) && (c > cmin) && (b > bmin)) {
+    if (((sleft - sleftkeep) > tol) && (us > usmin) && (sright > srightmin)) {
       myservo.write(120); //Turn the wheels to the left.
       Serial.println("Scenario 4aL. Turn left.");
-      while (((d - dkeep) > tol) && (c > cmin) && (b > bmin)) {
-        cold = c;
-        b = read_b();
-        c = read_c();
-        d = read_d();
-        //if (cold-c > cdecmax){c = cold;} //Not good
+      while (((sleft - sleftkeep) > tol) && (us > usmin) && (sright > srightmin)) {
+        usold = us;
+        sright = read_sright();
+        us = read_us();
+        sleft = read_sleft();
+        //if (usold-us > cdecmax){us = usold;} //Not good
       }
-      Serial.print("dkeep after loop:");
-      Serial.print(dkeep);
+      Serial.print("sleftkeep after loop:");
+      Serial.print(sleftkeep);
       Serial.println("cm");
     }
 
     
     //STRAIGHT FORWARD 
-    if (((d - dkeep) <= tol) && ((dkeep - d) <= tol) && (c > cmin) && (b > bmin)) {
+    if (((sleft - sleftkeep) <= tol) && ((sleftkeep - sleft) <= tol) && (us > usmin) && (sright > srightmin)) {
       myservo.write(110); // Drive straight forward
       analogWrite(3, v_straight); //Set a high speed
       Serial.println("Scenario 4aS. Drive straight forward.");
-      while (((d - dkeep) <= tol) && ((dkeep - d) <= tol) && (c > cmin) && (b > bmin)) {
-        cold = c;
-        b = read_b();
-        c = read_c();
-        d = read_d();
-        //if (cold-c > cdecmax){c = cold;}
+      while (((sleft - sleftkeep) <= tol) && ((sleftkeep - sleft) <= tol) && (us > usmin) && (sright > srightmin)) {
+        usold = us;
+        sright = read_sright();
+        us = read_us();
+        sleft = read_sleft();
+        //if (usold-us > cdecmax){us = usold;}
       }
-      Serial.print("dkeep after loop:");
-      Serial.print(dkeep);
+      Serial.print("sleftkeep after loop:");
+      Serial.print(sleftkeep);
       Serial.println("cm");
     }
   }
   else {//Scenario 4b. Keep a constant a
-    if (((bkeep - b) > tol2) && (c > cmin) && (d > dmin)) {
+    if (((srightkeep - sright) > tol2) && (us > usmin) && (sleft > sleftmin)) {
       for (i = 115; i <= 135; i = i + 5) {
         myservo.write(i); //Turn the wheels to the left.
         delay(1);
       }
-      Serial.println("Scenario 4bLL. Turn sharply left.");
-      while (((bkeep - b) > tol2) && (c > cmin) && (d > dmin)) {
-        cold = c;
-        b = read_b();
-        c = read_c();
-        d = read_d();
-        //if (cold-c > cdecmax){c = cold;}
+      Serial.println("Scenario 4LL. Turn sharply left.");
+      while (((srightkeep - sright) > tol2) && (us > usmin) && (sleft > sleftmin)) {
+        usold = us;
+        sright = read_sright();
+        us = read_us();
+        sleft = read_sleft();
+        //if (usold-us > cdecmax){us = usold;}
       }
-      Serial.print("bkeep after loop:");
-      Serial.print(bkeep);
+      Serial.print("srightkeep after loop:");
+      Serial.print(srightkeep);
       Serial.println("cm");
     }
-    if (((bkeep - b) > tol) && (c > cmin) && (d > dmin)) {
+    if (((srightkeep - sright) > tol) && (us > usmin) && (sleft > sleftmin)) {
       myservo.write(120); //Turn the wheels to the left.
       Serial.println("Scenario 4bL. Turn left.");
-      while (((bkeep - b) > tol) && (c > cmin) && (d > dmin)) {
-        cold = c;
-        b = read_b();
-        c = read_c();
-        d = read_d();
-        //if (cold-c > cdecmax){c = cold;}
+      while (((srightkeep - sright) > tol) && (us > usmin) && (sleft > sleftmin)) {
+        usold = us;
+        sright = read_sright();
+        us = read_us();
+        sleft = read_sleft();
+        //if (usold-us > cdecmax){us = usold;}
       }
-      Serial.print("bkeep after loop:");
-      Serial.print(bkeep);
+      Serial.print("srightkeep after loop:");
+      Serial.print(srightkeep);
       Serial.println("cm");
     }
-    if (((b - bkeep) > tol2) && (c > cmin) && (d > dmin)) {
+    if (((sright - srightkeep) > tol2) && (us > usmin) && (sleft > sleftmin)) {
       for (i = 105; i >= 85; i = i - 5) {
         myservo.write(i); //Turn the wheels to the right.
         delay(1);
       }
       Serial.println("Scenario 4bRR. Turn sharply right.");
-      while (((b - bkeep) > tol2) && (c > cmin) && (d > dmin)) {
-        cold = c;
-        b = read_b();
-        c = read_c();
-        d = read_d();
-        //if (cold-c > cdecmax){c = cold;}
+      while (((sright - srightkeep) > tol2) && (us > usmin) && (sleft > sleftmin)) {
+        usold = us;
+        sright = read_sright();
+        us = read_us();
+        sleft = read_sleft();
+        //if (usold-us > cdecmax){us = usold;}
       }
-      Serial.print("bkeep after loop:");
-      Serial.print(bkeep);
+      Serial.print("srightkeep after loop:");
+      Serial.print(srightkeep);
       Serial.println("cm");
     }
-    if (((b - bkeep) > tol) && (c > cmin) && (d > dmin)) {
+    if (((sright - srightkeep) > tol) && (us > usmin) && (sleft > sleftmin)) {
       myservo.write(98); //Turn the wheels to the right.
       Serial.println("Scenario 4bR. Turn right.");
-      while (((b - bkeep) > tol) && (c > cmin) && (d > dmin)) {
-        cold = c;
-        b = read_b();
-        c = read_c();
-        d = read_d();
-        //if (cold-c > cdecmax){c = cold;}
+      while (((sright - srightkeep) > tol) && (us > usmin) && (sleft > sleftmin)) {
+        usold = us;
+        sright = read_sright();
+        us = read_us();
+        sleft = read_sleft();
+        //if (usold-us > cdecmax){us = usold;}
       }
-      Serial.print("bkeep after loop:");
-      Serial.print(bkeep);
+      Serial.print("srightkeep after loop:");
+      Serial.print(srightkeep);
       Serial.println("cm");
     }
-    if (((b - bkeep) <= tol) && ((bkeep - b) <= tol) && (c > cmin) && (d > dmin)) {
+    if (((sright - srightkeep) <= tol) && ((srightkeep - sright) <= tol) && (us > usmin) && (sleft > sleftmin)) {
       myservo.write(110); // Drive straight forward
       analogWrite(3, v_straight); //Set a high speed
       Serial.println("Scenario 4bS. Drive straight forward.");
-      while (((b - bkeep) <= tol) && ((bkeep - b) <= tol) && (c > cmin) && (d > dmin)) {
-        cold = c;
-        b = read_b();
-        c = read_c();
-        d = read_d();
-        //if (cold-c > cdecmax){c = cold;}
+      while (((sright - srightkeep) <= tol) && ((srightkeep - sright) <= tol) && (us > usmin) && (sleft > sleftmin)) {
+        usold = us;
+        sright = read_sright();
+        us = read_us();
+        sleft = read_sleft();
+        //if (usold-us > cdecmax){us = usold;}
       }
-      Serial.print("bkeep after loop:");
-      Serial.print(bkeep);
+      Serial.print("srightkeep after loop:");
+      Serial.print(srightkeep);
       Serial.println("cm");
     }
   }
-  //Exit from step 4 above should only take place if c < cmin or b < bmin or d < dmin.
+  //Exit from step 4 above should only take place if us < usmin or b < bmin or d < dmin.
