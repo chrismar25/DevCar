@@ -5,9 +5,9 @@ function [v, gamma] = PoseController(states, align)
 %   Date: 2018-01-19
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    k_rho = 0.3;
-    k_alpha = 2;
-    k_beta = -0.3;
+    k_rho = 0.5;
+    k_alpha = 3;
+    k_beta = -1.4;
     
     if (align == false)
         v = k_rho*states(1);
