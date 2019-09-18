@@ -1,9 +1,11 @@
-function [range, angle] = lidarSensor(Vehicle, wall)
+function [range, angle] = lidarSensor(Vehicle)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   HOME EXAM PART - Telerobotics and applied sensor fusion, 7.5hp
 %   Author: Henrik Söderlund
 %   Date: 2018-01-19
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    wall = [8; pi/6];
     
     dist = wall(1);
     ang = wall(2);
@@ -29,6 +31,6 @@ function [range, angle] = lidarSensor(Vehicle, wall)
     angle = atan2(lidarHit(2), lidarHit(1));
     
     range = range + (0.1)*randn;
-    angle = angle + (5*pi/180)*randn;
+    angle = angle + (7*pi/180)*randn;
     
 end
