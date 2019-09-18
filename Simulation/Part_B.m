@@ -15,6 +15,9 @@ x = 20;
 % The default distance to to keep from the wall
 d = 3;
 
+% Distance and angle to wall
+wallPose = [8; pi/6];
+
 % Vehicle parameters
 vehicleLength = 3;  % Vehicle length between wheel axes [m]
 vehicleWidth = 2;   % Vehicle width between wheels [m]
@@ -28,7 +31,7 @@ startSpeed = 0; % Start speed [rad/s]
 startSteering = 0; % Start steering [rad]
 
 % Minimum distance to stop the vehicle in front of the goal
-stopDistance = 0.2;
+stopDistance = 0.4;
 
 % Sensor position relative to the robot
 relSensorPos = [0; 0];
@@ -58,7 +61,7 @@ goalEstPoseHistory = zeros(3, maxEpochs);
 MahalHistory = zeros(1, maxEpochs);
 
 % Get ground truth of wall
-wallTrue = groundTruthSensor(Vehicle);
+wallTrue = groundTruthSensor(Vehicle, wallPose);
 
 % Plot the first visual of the simulation
 fig = figure(1);
@@ -91,7 +94,7 @@ while(~strcmp(str,'exit'))
         d = str2double(input(prompt,'s'));
         
         % Get the current state of the laser sensor
-        [range, angle] = lidarSensor(Vehicle);
+        [range, angle] = lidarSensor(Vehicle, wallPose);
         % Convert sensed wall to world wall
         [wall, distanceDriven] = SensorToWorldWall(Vehicle, range, angle);
         
@@ -113,9 +116,9 @@ while(~strcmp(str,'exit'))
             epoch = epoch + 1;
             
             % Get ground truth
-            wallTrue = groundTruthSensor(Vehicle);
+            wallTrue = groundTruthSensor(Vehicle, wallPose);
             % Get the current state of the laser sensor
-            [range, angle] = lidarSensor(Vehicle);
+            [range, angle] = lidarSensor(Vehicle, wallPose);
             % Convert sensed wall to world wall
             [wall, distanceDriven] = SensorToWorldWall(Vehicle, range, angle);
             

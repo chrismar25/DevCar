@@ -18,6 +18,11 @@ x = 20;
 % The default distance to to keep from the wall
 d = 3;
 
+% Distance and angle to wall
+wallPose1 = [8; pi/6];
+wallPose2 = [8; pi/6+pi];
+
+
 % Vehicle parameters
 vehicleLength = 3;                  % Vehicle length between wheel axes [m]
 vehicleWidth = 2;                   % Vehicle width between wheels [m]
@@ -34,10 +39,13 @@ startSteering = 0; % Start steering [rad]
 stopDistance = 0.2;
 
 % Lidar Sensor poses relative to the robot (x, y, theta)
-lidars_relSensorPos = [0,0; 0,0; 0,0];
+lidars_relSensorPos = [3,3; 0.5, -0.5; pi/6,-pi/6];
 
 % Ultrasound Sensor pose relative to the robot (x, y, theta)
 ultra_relSensorPos = [0; 0; 0];
+
+% Lidar maximum range [m]
+lidarRange = 14;
 
 % Define the robot struct
 Vehicle = struct('pose',             startPose, ...
@@ -51,6 +59,7 @@ Vehicle = struct('pose',             startPose, ...
                  'vehicleWidth',     vehicleWidth, ...
                  'vehicleLength',    vehicleLength, ...
                  'trajectory',       zeros(2,maxEpochs), ...
+                 'lidarRange',       lidarRange, ...
                  'lidars_relSensorPos', lidars_relSensorPos, ...
                  'ultra_relSensorPos',  ultra_relSensorPos);
              
@@ -65,13 +74,15 @@ goalEstPoseHistory = zeros(3, maxEpochs);
 MahalHistory = zeros(1, maxEpochs);
 
 % Get ground truth of wall
-wallTrue = groundTruthSensor(Vehicle);
+wallTrue1 = groundTruthSensor(Vehicle, wallPose1);
+wallTrue2 = groundTruthSensor(Vehicle, wallPose2);
 
 % Plot the first visual of the simulation
 fig = figure(1);
 hold on;
 PlotQuadVehicle(Vehicle.pose(1),Vehicle.pose(2),Vehicle.pose(3),Vehicle.steering);
-PlotHoughLine(wallTrue(1), wallTrue(2), 'r');
+PlotHoughLine(wallTrue1(1), wallTrue1(2), 'r');
+PlotHoughLine(wallTrue2(1), wallTrue2(2), 'r');
 axis equal
 
 % Define input variable
@@ -91,47 +102,42 @@ while(~strcmp(str,'exit'))
     d = str2double(input(prompt,'s'));
     
     % Get the current state of the laser sensor
-    [ranges, angles] = fixedLidarSensors(Vehicle);
+    [range1_1, range2_1] = fixedLidarSensors(Vehicle, wallPose1);
+    [range1_2, range2_2] = fixedLidarSensors(Vehicle, wallPose2);
     
-    % TODO: Split ranges and angles and treat both lidars individually
     % TODO: Add Ultrasound sensor
-    
-    % Convert sensed wall to world wall
-    [wall, distanceDriven] = SensorToWorldWall(Vehicle, range, angle);
     
     % Compute a goal point along the wall using the user defined
     % variables
-    goalPose = GetGoalPoint(Vehicle, wall, x, d);
+    %goalPose = GetGoalPoint(Vehicle, wall, x, d);
     % Compute the new states to be used by the controller
-    states = ComputeNewStates(Vehicle, goalPose);
+    %states = ComputeNewStates(Vehicle, goalPose);
     
     % Define the observation covariance matrix and the goal pose for 
     % both observation and estimation
     C = eye(3).*0.1;
-    c = goalPose;
-    s = goalPose;
+    %c = goalPose;
+    %s = goalPose;
     
     % Drive to goal point
-    while (distanceDriven < (abs(x)-stopDistance) && epoch < maxEpochs)
+    while (epoch < maxEpochs) % distanceDriven < (abs(x)-stopDistance) && 
         % Increment epoch
         epoch = epoch + 1;
         
         % Get ground truth
-        wallTrue = groundTruthSensor(Vehicle);
+        wallTrue1 = groundTruthSensor(Vehicle, wallPose1);
+        wallTrue2 = groundTruthSensor(Vehicle, wallPose2);
         % Get the current state of the laser sensor
-        [ranges, angles] = fixedLidarSensors(Vehicle);
+        [range1_1, range2_1] = fixedLidarSensors(Vehicle, wallPose1);
+        [range1_2, range2_2] = fixedLidarSensors(Vehicle, wallPose2);
         
-        % TODO: Split ranges and angles and treat both lidars individually
         % TODO: Add Ultrasound sensor
-        
-        % Convert sensed wall to world wall
-        [wall, distanceDriven] = SensorToWorldWall(Vehicle, range, angle);
         
         % Compute a goal point along the wall using the user defined
         % variables
-        goalPose = GetGoalPoint(Vehicle, wall, x, d);
+        %goalPose = GetGoalPoint(Vehicle, wall, x, d);
         % Compute the new states to be used by the controller
-        states = ComputeNewStates(Vehicle, s);
+        %states = ComputeNewStates(Vehicle, s);
         
         % Plot the current state in the simulation
         fig = figure(1);
@@ -143,23 +149,24 @@ while(~strcmp(str,'exit'))
         % Plot vehicle pose
         PlotQuadVehicle(Vehicle.pose(1),Vehicle.pose(2),Vehicle.pose(3),Vehicle.steering);
         % Plot wall ground truth
-        PlotHoughLine(wallTrue(1), wallTrue(2), 'r');
+        PlotHoughLine(wallTrue1(1), wallTrue1(2), 'r');
+        PlotHoughLine(wallTrue2(1), wallTrue2(2), 'r');
         % Plot laser hit
-        PlotLaser(Vehicle, range, angle, 'g--');
+        %PlotLaser(Vehicle, range, angle, 'g--');
         % Plot line from vehicle to goal
-        plot([Vehicle.pose(1), goalPose(1)],[Vehicle.pose(2) goalPose(2)],'b--');
+        %plot([Vehicle.pose(1), goalPose(1)],[Vehicle.pose(2) goalPose(2)],'b--');
         % Plot observed goal point
-        plot(goalPose(1), goalPose(2), 'b*');
+        %plot(goalPose(1), goalPose(2), 'b*');
         % Plot observed goal orientation
-        quiver(goalPose(1), goalPose(2),cos(goalPose(3)),sin(goalPose(3)), 'b');
+        %quiver(goalPose(1), goalPose(2),cos(goalPose(3)),sin(goalPose(3)), 'b');
         % Plot covariance ellipse
-        if (sum(eig(C) > 0) == numel(eig(C)))
-            h1=error_ellipse(C(1:2,1:2), s(1:2));
-        end
+        %if (sum(eig(C) > 0) == numel(eig(C)))
+        %    h1=error_ellipse(C(1:2,1:2), s(1:2));
+        %end
         % Plot estimated goal point
-        plot(s(1), s(2), 'r*');
+        %plot(s(1), s(2), 'r*');
         % Plot estimated goal orientation
-        quiver(s(1), s(2),cos(s(3)),sin(s(3)), 'r');
+        %quiver(s(1), s(2),cos(s(3)),sin(s(3)), 'r');
         % Plot settings
         xlabel('World x [m]');
         ylabel('World y [m]');
@@ -174,48 +181,48 @@ while(~strcmp(str,'exit'))
         Vehicle.trajectory(:,epoch) = Vehicle.pose(1:2);
         
         % Compute controller 1 output from current states
-        [v, gamma1] = PoseController(states, align);
+        %[v, gamma1] = PoseController(states, align);
         % Compute controller 2 output from current states
-        gamma2 = WallController(states, Vehicle, wall, d);
+        %gamma2 = WallController(states, Vehicle, wall, d);
         % Combine controllers
-        gamma = gamma1 + gamma2;
+        %gamma = gamma1 + gamma2;
         
         % Determine if the vehicle if facing the goal, otherwise we
         % have to align it
-        if (states(2) <= pi/2 && states(2) > -pi/2)
-            align = false;
-        end
+        %if (states(2) <= pi/2 && states(2) > -pi/2)
+        %    align = false;
+        %end
 
         % Limit the linear velocity
-        v = min(v, Vehicle.maxSpeed);
+        %v = min(v, Vehicle.maxSpeed);
         % Limit the steering angle
-        gamma = clamp(gamma,Vehicle.steeringLimits);
+        %gamma = clamp(gamma,Vehicle.steeringLimits);
 
         % Compute applied wheel angular velocities
-        [w_r, w_l] = ComputeWheelSpeeds(Vehicle, v, gamma);
+        %[w_r, w_l] = ComputeWheelSpeeds(Vehicle, v, gamma);
 
         % Apply wheel angular velocities
-        Vehicle.wheelSpeed_Right = w_r;
-        Vehicle.wheelSpeed_Left = w_l;
+        %Vehicle.wheelSpeed_Right = w_r;
+        %Vehicle.wheelSpeed_Left = w_l;
 
         % Update states for controllers
-        states = UpdateState(states, Vehicle , dt);
+        %states = UpdateState(states, Vehicle , dt);
 
         % Store logging data
-        speedHistory(:,epoch) = [w_r; w_l];
-        sensorHistory(:,epoch) = [range; angle];
-        goalPoseHistory(:,epoch) = goalPose;
-        goalEstPoseHistory(:,epoch) = s;
+        %speedHistory(:,epoch) = [w_r; w_l];
+        %sensorHistory(:,epoch) = [range; angle];
+        %goalPoseHistory(:,epoch) = goalPose;
+        %goalEstPoseHistory(:,epoch) = s;
 
         % Compute covariance matrix of observed goal points
-        C = CovarianceMatrix(goalPoseHistory(:,1:epoch));
-        c = goalPose;
+        %C = CovarianceMatrix(goalPoseHistory(:,1:epoch));
+        %c = goalPose;
 
         % Store mahalanobis distance history
-        MahalHistory(epoch) = (s-c)'*inv(C)*(s-c);
+        %MahalHistory(epoch) = (s-c)'*inv(C)*(s-c);
 
         % Fuse current observation with estimated goal point
-        s = SensorFusion(c, s, 0.1);
+        %s = SensorFusion(c, s, 0.1);
 
     end
     
