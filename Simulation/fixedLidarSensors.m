@@ -19,26 +19,79 @@ function [range1, range2] = fixedLidarSensors(Vehicle, wall)
     y3=y1-y2;
     x2=x1+x2;
     y2=y1+y2;
-    
-    lidar1_line = Vehicle.pose(1:2) + [lidar1(1) lidar1(1)+Vehicle.lidarRange*cos(lidar1(3)+Vehicle.pose(3)); ...
-                                       lidar1(2) lidar1(2)+Vehicle.lidarRange*sin(lidar1(3)+Vehicle.pose(3))];
-               
-    lidar2_line = Vehicle.pose(1:2) + [lidar2(1) lidar2(1)+Vehicle.lidarRange*cos(lidar2(3)+Vehicle.pose(3)); ...
-                                       lidar2(2) lidar2(2)+Vehicle.lidarRange*sin(lidar2(3)+Vehicle.pose(3))];
-    
-    [x1_x, y1_x, ~] = findIntersection(lidar1_line, [x2 x3; y2 y3]);
-    [x2_x, y2_x, ~] = findIntersection(lidar2_line, [x2 x3; y2 y3]);
-    
-    plot(lidar1_line(1,1), lidar1_line(2,1), 'b*');
-    plot(lidar2_line(1,1), lidar2_line(2,1), 'r*');
-    
-    quiver(lidar1_line(1,1), lidar1_line(2,1),2*cos(lidar1(3)+Vehicle.pose(3)),2*sin(lidar1(3)+Vehicle.pose(3)), 'b');
-    quiver(lidar2_line(1,1), lidar2_line(2,1),2*cos(lidar2(3)+Vehicle.pose(3)),2*sin(lidar2(3)+Vehicle.pose(3)), 'r');
-    
-    plot(x1_x, y1_x, 'bs');
-    plot(x2_x, y2_x, 'rs');
 
-    range1 = norm([x1_x; y1_x] - lidar1_line(:,1)) + (0.2)*randn;
-    range2 = norm([x2_x; y2_x] - lidar2_line(:,1)) + (0.2)*randn;
+    R_rob = [cos(Vehicle.pose(3)), -sin(Vehicle.pose(3));
+             sin(Vehicle.pose(3)), cos(Vehicle.pose(3))];
+     
+    lidar1_pos = Vehicle.pose(1:2) + R_rob*lidar1(1:2);
+    lidar2_pos = Vehicle.pose(1:2) + R_rob*lidar2(1:2);
+  
+    lidar1_pose = [lidar1_pos; lidar1(3) + Vehicle.pose(3)];
+    lidar2_pose = [lidar2_pos; lidar2(3) + Vehicle.pose(3)];
+    
+    lidar1_line = [lidar1_pose(1) lidar1_pose(1)+Vehicle.lidarRange*cos(lidar1_pose(3)); ...
+                   lidar1_pose(2) lidar1_pose(2)+Vehicle.lidarRange*sin(lidar1_pose(3))];
+               
+    lidar2_line = [lidar2_pose(1) lidar2_pose(1)+Vehicle.lidarRange*cos(lidar2_pose(3)); ...
+                   lidar2_pose(2) lidar2_pose(2)+Vehicle.lidarRange*sin(lidar2_pose(3))];
+    
+    [x1_x, y1_x, flag1] = findIntersection(lidar1_line, [x2 x3; y2 y3]);
+    [x2_x, y2_x, flag2] = findIntersection(lidar2_line, [x2 x3; y2 y3]);
+    
+    % TODO: REMOVE POINT BEHIND
+%     if (flag1 ~= -1)
+%         onLine1 = isPointOnLine(lidar1_line(:,1)', lidar1_line(:,2)', [x1_x; y1_x]');
+%         if onLine1 ~= 1
+%             flag1 = -1;
+%         end
+%     end
+%     
+%     if (flag2 ~= -1)
+%         onLine2 = isPointOnLine(lidar2_line(:,1)', lidar2_line(:,2)', [x2_x; y2_x]');
+%         if onLine2 ~= 1
+%             flag2 = -1;
+%         end
+%     end
+    
+    if (flag1 ~= -1)
+        plot(lidar1_line(1,1), lidar1_line(2,1), 'm.', 'MarkerSize', 5);
+        quiver(lidar1_line(1,1), lidar1_line(2,1),2*cos(lidar1(3)+Vehicle.pose(3)),2*sin(lidar1(3)+Vehicle.pose(3)), 'm');
+        plot(x1_x, y1_x, 'ms');
+
+        range1 = norm([x1_x; y1_x] - lidar1_line(:,1)) + (0.2)*randn;
+    else
+        range1 = Vehicle.lidarRange;
+    end
+    
+    if (flag2 ~= -1)
+        plot(lidar2_line(1,1), lidar2_line(2,1), 'm.', 'MarkerSize', 5);
+        quiver(lidar2_line(1,1), lidar2_line(2,1),2*cos(lidar2(3)+Vehicle.pose(3)),2*sin(lidar2(3)+Vehicle.pose(3)), 'm');
+        plot(x2_x, y2_x, 'ms');
+
+        range2 = norm([x2_x; y2_x] - lidar2_line(:,1)) + (0.2)*randn;
+    else
+        range2 = Vehicle.lidarRange;
+    end
+    
+    function R = isPointOnLine(P1, P2, Q)
+        % Is point Q=[x3,y3] on line through P1=[x1,y1] and P2=[x2,y2]
+        % Normal along the line:
+        P12 = P2 - P1;
+        L12 = sqrt(P12 * P12');
+        N   = P12 / L12;
+        % Line from P1 to Q:
+        PQ = Q - P1;
+        % Norm of distance vector: LPQ = N x PQ
+        Dist = abs(N(1) * PQ(2) - N(2) * PQ(1));
+        % Consider rounding errors:
+        Limit = 10 * eps(max(abs(cat(1, P1(:), P2(:), Q(:)))));
+        R     = (Dist < Limit);
+        % Consider end points if any 4th input is used:
+        if R && nargin == 4
+          % Projection of the vector from P1 to Q on the line:
+          L = PQ * N.';  % DOT product
+          R = (L > 0.0 && L < L12);
+        end
+    end
     
 end

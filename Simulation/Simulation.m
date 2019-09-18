@@ -96,10 +96,12 @@ epoch = 1;
 while(~strcmp(str,'exit'))
 
     % Get the variables needed
-    prompt = 'Enter distance to drive along wall: ';
+    prompt = 'Enter goal X-coordinate:';
     x = str2double(input(prompt,'s'));
-    prompt = 'Enter distance from wall: ';
-    d = str2double(input(prompt,'s'));
+    prompt = 'Enter goal Y-coordinate:';
+    y = str2double(input(prompt,'s'));
+    prompt = 'Enter goal angle of approach: ';
+    ang = str2double(input(prompt,'s'));
     
     % Get the current state of the laser sensor
     [range1_1, range2_1] = fixedLidarSensors(Vehicle, wallPose1);
@@ -110,14 +112,15 @@ while(~strcmp(str,'exit'))
     % Compute a goal point along the wall using the user defined
     % variables
     %goalPose = GetGoalPoint(Vehicle, wall, x, d);
+    goalPose = [x; y; ang];
     % Compute the new states to be used by the controller
-    %states = ComputeNewStates(Vehicle, goalPose);
+    states = ComputeNewStates(Vehicle, goalPose);
     
     % Define the observation covariance matrix and the goal pose for 
     % both observation and estimation
-    C = eye(3).*0.1;
-    %c = goalPose;
-    %s = goalPose;
+    %C = eye(3).*0.1;
+    c = goalPose;
+    s = goalPose;
     
     % Drive to goal point
     while (epoch < maxEpochs) % distanceDriven < (abs(x)-stopDistance) && 
@@ -137,7 +140,7 @@ while(~strcmp(str,'exit'))
         % variables
         %goalPose = GetGoalPoint(Vehicle, wall, x, d);
         % Compute the new states to be used by the controller
-        %states = ComputeNewStates(Vehicle, s);
+        states = ComputeNewStates(Vehicle, s);
         
         % Plot the current state in the simulation
         fig = figure(1);
@@ -154,19 +157,19 @@ while(~strcmp(str,'exit'))
         % Plot laser hit
         %PlotLaser(Vehicle, range, angle, 'g--');
         % Plot line from vehicle to goal
-        %plot([Vehicle.pose(1), goalPose(1)],[Vehicle.pose(2) goalPose(2)],'b--');
+        plot([Vehicle.pose(1), goalPose(1)],[Vehicle.pose(2) goalPose(2)],'b--');
         % Plot observed goal point
-        %plot(goalPose(1), goalPose(2), 'b*');
+        plot(goalPose(1), goalPose(2), 'b*');
         % Plot observed goal orientation
-        %quiver(goalPose(1), goalPose(2),cos(goalPose(3)),sin(goalPose(3)), 'b');
+        quiver(goalPose(1), goalPose(2),2*cos(goalPose(3)),2*sin(goalPose(3)), 'b');
         % Plot covariance ellipse
         %if (sum(eig(C) > 0) == numel(eig(C)))
         %    h1=error_ellipse(C(1:2,1:2), s(1:2));
         %end
         % Plot estimated goal point
-        %plot(s(1), s(2), 'r*');
+        plot(s(1), s(2), 'r*');
         % Plot estimated goal orientation
-        %quiver(s(1), s(2),cos(s(3)),sin(s(3)), 'r');
+        quiver(s(1), s(2),2*cos(s(3)),2*sin(s(3)), 'r');
         % Plot settings
         xlabel('World x [m]');
         ylabel('World y [m]');
@@ -181,48 +184,49 @@ while(~strcmp(str,'exit'))
         Vehicle.trajectory(:,epoch) = Vehicle.pose(1:2);
         
         % Compute controller 1 output from current states
-        %[v, gamma1] = PoseController(states, align);
+        [v, gamma1] = PoseController(states, align);
         % Compute controller 2 output from current states
         %gamma2 = WallController(states, Vehicle, wall, d);
+        gamma2 = 0;
         % Combine controllers
-        %gamma = gamma1 + gamma2;
+        gamma = gamma1 + gamma2;
         
         % Determine if the vehicle if facing the goal, otherwise we
         % have to align it
-        %if (states(2) <= pi/2 && states(2) > -pi/2)
-        %    align = false;
-        %end
+        if (states(2) <= pi/2 && states(2) > -pi/2)
+            align = false;
+        end
 
         % Limit the linear velocity
-        %v = min(v, Vehicle.maxSpeed);
+        v = min(v, Vehicle.maxSpeed);
         % Limit the steering angle
-        %gamma = clamp(gamma,Vehicle.steeringLimits);
+        gamma = clamp(gamma,Vehicle.steeringLimits);
 
         % Compute applied wheel angular velocities
-        %[w_r, w_l] = ComputeWheelSpeeds(Vehicle, v, gamma);
+        [w_r, w_l] = ComputeWheelSpeeds(Vehicle, v, gamma);
 
         % Apply wheel angular velocities
-        %Vehicle.wheelSpeed_Right = w_r;
-        %Vehicle.wheelSpeed_Left = w_l;
+        Vehicle.wheelSpeed_Right = w_r;
+        Vehicle.wheelSpeed_Left = w_l;
 
         % Update states for controllers
-        %states = UpdateState(states, Vehicle , dt);
+        states = UpdateState(states, Vehicle , dt);
 
         % Store logging data
-        %speedHistory(:,epoch) = [w_r; w_l];
+        speedHistory(:,epoch) = [w_r; w_l];
         %sensorHistory(:,epoch) = [range; angle];
-        %goalPoseHistory(:,epoch) = goalPose;
-        %goalEstPoseHistory(:,epoch) = s;
+        goalPoseHistory(:,epoch) = goalPose;
+        goalEstPoseHistory(:,epoch) = s;
 
         % Compute covariance matrix of observed goal points
         %C = CovarianceMatrix(goalPoseHistory(:,1:epoch));
-        %c = goalPose;
+        c = goalPose;
 
         % Store mahalanobis distance history
         %MahalHistory(epoch) = (s-c)'*inv(C)*(s-c);
 
         % Fuse current observation with estimated goal point
-        %s = SensorFusion(c, s, 0.1);
+        s = SensorFusion(c, s, 0.1);
 
     end
     
