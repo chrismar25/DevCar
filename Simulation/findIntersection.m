@@ -25,10 +25,7 @@ function [x_x, y_x, flag] = findIntersection(line1, line2)
     x_x = 0;
     y_x = 0;
 
-    disp(line1)
-    disp(line2)
-
-    if (dot(hC,hD) < 0)
+    if (dot(hC,hD) < 0) % dot --> Returns thescalar product 
 
         try
             % Fit linear polynomial
@@ -41,6 +38,7 @@ function [x_x, y_x, flag] = findIntersection(line1, line2)
             % If no intersection was found, output flag=-1
             if (isnan(x_x) || isnan(y_x))
                 flag = -1;
+               
             % Otherwise, output flag=0
             else 
                 flag = 0;
@@ -54,3 +52,5 @@ function [x_x, y_x, flag] = findIntersection(line1, line2)
     end
 
 end
+
+
