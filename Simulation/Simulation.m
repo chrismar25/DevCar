@@ -31,7 +31,7 @@ steeringLimits = [-1, 1].*(60*pi/180); % Steering limits [rad]
 maxSpeed = 3;                       % Maximum linear velocity [m/s]
 
 % Define starting configuration of robot
-startPose = [0; 0; 0]; % Start pose
+startPose = [0; 0; 0]; % Start pose (x,y,theta)
 startSpeed = 0; % Start speed [rad/s]
 startSteering = 0; % Start steering [rad]
 
@@ -80,9 +80,9 @@ wallTrue2 = groundTruthSensor(Vehicle, wallPose2);
 % Plot the first visual of the simulation
 fig = figure(1);
 hold on;
-PlotQuadVehicle(Vehicle.pose(1),Vehicle.pose(2),Vehicle.pose(3),Vehicle.steering); % Plot the car
-PlotHoughLine(wallTrue1(1), wallTrue1(2), 'r'); % Plot wall 1
-PlotHoughLine(wallTrue2(1), wallTrue2(2), 'r'); % Plot wall 2
+PlotQuadVehicle(Vehicle.pose(1),Vehicle.pose(2),Vehicle.pose(3),Vehicle.steering);
+PlotHoughLine(wallTrue1(1), wallTrue1(2), 'r');
+PlotHoughLine(wallTrue2(1), wallTrue2(2), 'r');
 axis equal
 
 % Define input variable
@@ -179,19 +179,13 @@ while(~strcmp(str,'exit'))
         
         % Update dead-reckoning of the vehicle
         Vehicle = DeadReckoning(Vehicle, dt);
-        %In navigation, dead reckoning is the process of calculating one's current position 
-        %by using a previously determined position, or fix, and advancing that position based 
-        %upon known or estimated speeds over elapsed time and course. The corresponding term in 
-        %biology, used to describe the processes by which animals update their estimates of 
-        %position or heading, is path integration.
-        
-        
         
         % Store trajectory in vehicle struct
         Vehicle.trajectory(:,epoch) = Vehicle.pose(1:2);
         
         % Compute controller 1 output from current states
-         % Compute controller 2 output from current states
+        [v, gamma1] = PoseController(states, align);
+        % Compute controller 2 output from current states
         %gamma2 = WallController(states, Vehicle, wall, d);
         gamma2 = 0;
         % Combine controllers

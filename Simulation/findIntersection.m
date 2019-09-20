@@ -25,7 +25,7 @@ function [x_x, y_x, flag] = findIntersection(line1, line2)
     x_x = 0;
     y_x = 0;
 
-    if (dot(hC,hD) < 0) % dot --> Returns thescalar product 
+    if (dot(hC,hD) < 0)
 
         try
             % Fit linear polynomial
