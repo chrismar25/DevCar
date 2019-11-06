@@ -43,13 +43,8 @@ int AddressLidarSensorB = 11;
 
 int avgIrA = 0;
 int avgIrB = 0;
-<<<<<<< HEAD
-//int posIr = 0;
-int filterIr = 2;
-=======
 int posIr = 0;
 int filterIr = 20;
->>>>>>> Development
 
 ////////////////////////////////////////////////////////////////
 //Define pins and variables for the Ultrasonic sensor
@@ -60,15 +55,9 @@ int UsDistance = 0;
 
 ////////////////////////////////////////////////////////////////
 //                      Void Setup
-<<<<<<< HEAD
-////////////////////////////////////////////////////////////////  
-void setup() {
-  Serial.begin(4800);
-=======
 ////////////////////////////////////////////////////////////////
 void setup() {
   Serial.begin(9600);
->>>>>>> Development
   Wire.begin();
   Wire.setClock(400000); // use 400 kHz I2C
 
@@ -95,19 +84,11 @@ void setup() {
   pinMode(isolatedVoltagePolarity, OUTPUT);
   pinMode(isolatedVoltageActivation, OUTPUT);
   pinMode(isolatedVoltageCurrent, INPUT);
-<<<<<<< HEAD
-  
-  digitalWrite(isolatedVoltagePolarity, HIGH);
-  while (!Serial);
-  Serial.println("PinModes set & serial communication established!!!");
- 
-=======
 
   digitalWrite(isolatedVoltagePolarity, HIGH);
   while (!Serial);
   Serial.println("PinModes set & serial communication established!!!");
 
->>>>>>> Development
 }
 ///////////////////////////////////////////////////////////////////
 //                      Void Loop
@@ -116,48 +97,6 @@ void setup() {
 
 void loop() {
   //Isolated voltage testing
-<<<<<<< HEAD
- /* int levelIV = setIsolatedVoltageFromSerial();
-  setIsolatedVoltageLevel(levelIV);
-  Serial.print("Isolated voltage variable is currently: ");
-  Serial.println(isolatedVoltage);
-  
-  
-  //Steering with a combination of Ir and Lidar testing
-  //int something = steerIrLid (lidarSensorA, lidarSensorB, filterLid, IrSensorA, IrSensorB, filterIr);
-
-*/  
-  
-  //Steering with lidar testing
-  int steerAngle = steeringWithLidarSensors(lidarSensorA, lidarSensorB, filterLid);
-  int posIR =  positionOnTrack(IrSensorA, IrSensorB, filterIr);
-
-  //Steering with Ir sensor testing
-    int steerIR = steeringWithIr(IrSensorA, IrSensorB, filterIr);
-// setSteeringServo(myservo, 90);
-  
-  //Lidar
-  //printFromLidarSensors(lidarSensorA, lidarSensorB);
-  //plotFromLidarSensors(lidarSensorA, lidarSensorB);
-  
-  //Infra-Red
-  //printFromIrSensors(IrSensorA, IrSensorB);
-  //plotFromIrSensors(IrSensorA, IrSensorB);
-  //plotPositionOnTrack(IrSensorA, IrSensorB, filterIr);
-  
-  //Ultrasonic
-  //printFromUltrasonicSensor(UsTrigPin, UsEchoPin);
-  //plotFromUltrasonicSensor(UsTrigPin, UsEchoPin);
-
-  Serial.println("");
-  //From Lidar to Steering Servo
- int distLeft = lidarSensorA.read();
-  int distRight = lidarSensorB.read();
-  int servoAng = LidarSteeringTesting(distLeft, distRight);
-  Serial.println(servoAng);
-  setSteeringServo(myservo, servoAng);
-  
-=======
   /* int levelIV = setIsolatedVoltageFromSerial();
     setIsolatedVoltageLevel(levelIV);
     Serial.print("Isolated voltage variable is currently: ");
@@ -202,5 +141,4 @@ void loop() {
 */
   
 
->>>>>>> Development
 }

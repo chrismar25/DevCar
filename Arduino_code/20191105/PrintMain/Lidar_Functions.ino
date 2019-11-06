@@ -35,19 +35,12 @@ int steeringWithLidarSensors(VL53L1X sensorA, VL53L1X sensorB, int smoothingLid)
   float sum = avgLidarA + avgLidarB;
   float exactPosOnTrack = (avgLidarA /sum)*100;
   int posLid = (int) exactPosOnTrack;
-<<<<<<< HEAD
-  Serial.print("posLid: ");
-  Serial.println(exactPosOnTrack);
-  //prints sensor value for sensor A and B
-  int strAngle = map(posLid, 0, 100, 180, 0);
-=======
   //Serial.print("posLid: ");
   //Serial.println(exactPosOnTrack);
   //prints sensor value for sensor A and B
   int strAngle = map(posLid, 0, 100, 180, 0);
   //Serial.print("Steering Angle: ");
   Serial.println(strAngle);
->>>>>>> Development
   return strAngle;
 }
 

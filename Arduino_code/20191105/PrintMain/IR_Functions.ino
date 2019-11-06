@@ -4,13 +4,8 @@ void printFromIrSensors(int IrSensorA, int IrSensorB){
   Serial.print("  IR sensor B: ");
   Serial.print(readShortRangeIrSensor(IrSensorB));
   Serial.println();
-<<<<<<< HEAD
-  Serial.println("Relative position:");
-  Serial.println(positionOnTrack(IrSensorA, IrSensorB, filterIr));
-=======
   //Serial.println("Relative position:");
   //Serial.println(positionOnTrack(IrSensorA, IrSensorB, filterIr));
->>>>>>> Development
   delay(500);
 }
 
@@ -24,21 +19,12 @@ void plotFromIrSensors(int IrSensorA, int IrSensorB){
 int positionOnTrack(int sensorAPin, int sensorBPin, int smoothing){
   int ValueSensorA = readSensorVoltage(sensorAPin);
   avgIrA = (avgIrA * (smoothing - 1) + ValueSensorA) / smoothing;
-<<<<<<< HEAD
-  Serial.print("Value A: ");
-  Serial.print(avgIrA);
-  int ValueSensorB = readSensorVoltage(sensorBPin);
-  avgIrB = (avgIrB * (smoothing - 1) + ValueSensorB) / smoothing;
-  Serial.print(" Values B: ");
-  Serial.println(avgIrB);
-=======
   //Serial.print("Value A: ");
   //Serial.print(avgIrA);
   int ValueSensorB = readSensorVoltage(sensorBPin);
   avgIrB = (avgIrB * (smoothing - 1) + ValueSensorB) / smoothing;
   //Serial.print(" Values B: ");
   //Serial.println(avgIrB);
->>>>>>> Development
   float exactPosOnTrack = ValueSensorA / (ValueSensorA + ValueSensorB);
   int posOnTrack = (int) exactPosOnTrack;
   return posOnTrack;
@@ -61,11 +47,7 @@ void plotPositionOnTrack(int sensorAPin, int sensorBPin, int smoothing){
   posIr = exactPosOnTrack;
   int posOnTrack = (int) exactPosOnTrack;
   Serial.print(posIr);
-<<<<<<< HEAD
-  Serial.print(",");
-=======
   //Serial.print(",");
->>>>>>> Development
 }
 
 int steeringWithIr(int sensorAPin, int sensorBPin, int smoothing){
@@ -79,13 +61,6 @@ int steeringWithIr(int sensorAPin, int sensorBPin, int smoothing){
   float sum = avgIrA + avgIrB;
   float exactPosOnTrack = (float)(avgIrA /sum )*100;
   posIr = exactPosOnTrack;
-<<<<<<< HEAD
-  Serial.print("posIr: ");
-  Serial.print(posIr);
-  Serial.println();
-  int strAngle = map(posIr, 11, 65, 180, 0);
-  return strAngle;
-=======
   //Serial.print("posIr: ");
   //Serial.print(posIr);
   
@@ -94,7 +69,6 @@ int steeringWithIr(int sensorAPin, int sensorBPin, int smoothing){
   int strAngle = map(posIr, 20, 80, 180, 0);
   return strAngle;
   
->>>>>>> Development
 }
 
 int posWithIr(int sensorAPin, int sensorBPin, int smoothing){
